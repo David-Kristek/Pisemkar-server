@@ -17,7 +17,7 @@ const taskSchema = new mongoose.Schema(
     },
     group: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Group",mongoos
+      ref: "Group",
     },
     subject: {
       type: mongoose.Schema.Types.ObjectId,

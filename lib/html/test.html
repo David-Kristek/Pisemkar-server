@@ -1,0 +1,56 @@
+<style>
+  .button {
+    background-color: #4caf50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 28px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 18px;
+    margin: 4px 2px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+    background-color: white;
+    color: black;
+    border: 2px solid #008cba;
+    border-radius: 10px;
+  }
+  .button:hover {
+    background-color: #008cba;
+    color: white;
+  }
+</style>
+<div style="font-family: Arial, Helvetica, sans-serif">
+  <h2>Ověření vašeho emailu</h2>
+  <p>
+    Pokud jste se nedávno pokoušeli přihlásit do aplikace Písemkář kliknětě na
+    tlačítko ověřit email a poté se přesuňte zpátky do aplikace
+  </p>
+  <button id="button" onclick="onClickHandler()" class="button">
+    Ověřit email
+  </button>
+  <p id="verified" style="font-size: 18px; color: green"></p>
+</div>
+<div style="display: flex; justify-content: center; width: 100%">
+  <script>
+    const onClickHandler = async () => {
+      const button = document.getElementById("button");
+      const text = document.getElementById("verified");
+      button.innerText = "Chvíli";
+      const res = await fetch("http://10.0.0.2:5000/email_verification", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          body: JSON.stringify({ token }),
+        },
+      });
+      button.style.display = "none";
+      if (res.data == "verified") {
+        text.innerText = "Email ověřen, přesuňte se do zpátky aplikace";
+      } else {
+        text.innerText = "Nastala nečekaná chyba";
+      }
+    };
+  </script>
+</div>
