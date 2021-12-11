@@ -1,7 +1,7 @@
-import Task from "../modules/Task";
-import Subjects from "../modules/Subjects";
-import { validateData } from "../lib/validation";
-import Group from "../modules/Group";
+import Task from "../modules/Task.js";
+import Subjects from "../modules/Subjects.js";
+import { validateData } from "../lib/validation.js";
+import Group from "../modules/Group.js";
 export const createTask = async (req, res) => {
   if (validateData(["title", "date", "subject", "type"], req.body))
     return res.json({ validationError: true });

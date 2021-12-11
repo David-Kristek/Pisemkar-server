@@ -1,16 +1,16 @@
-import User from "../modules/User";
-import Group from "../modules/Group";
+import User from "../modules/User.js";
+import Group from "../modules/Group.js";
 import jwt from "jsonwebtoken";
-import { validateData } from "../lib/validation";
-import { sendEmail } from "../lib/email";
+import { validateData } from "../lib/validation.js";
+import { sendEmail } from "../lib/email.js";
 import {
   landingPageLogin,
   landingPageRegister,
   loginEmail,
   registerEmail,
-} from "../lib/html/templates";
+} from "../lib/html/templates.js";
 import fetcher from "node-fetch";
-import getCalendarData from "../lib/bakalariformater";
+import getCalendarData from "../lib/bakalariformater.js";
 
 const loginToGroup = async (req, res) => {
   console.log(req.body);

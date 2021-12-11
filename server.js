@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
-import socket from "./lib/sockets";
+import socket from "./lib/sockets/index.js";
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -35,7 +35,7 @@ app.get("/", (req, res) => {
   res.send("Hello");
 });
 
-import auth from "./routes/auth";
-import calendar from "./routes/calendar";
+import auth from "./routes/auth.js";
+import calendar from "./routes/calendar.js";
 app.use("/auth", auth);
-app.use("/calendar", calendar)
+app.use("/calendar", calendar);

@@ -4,7 +4,7 @@ import {
   createGroup,
   loginEmailVerification,
   createGroupEmailVerification,
-} from "../controllers/AuthController";
+} from "../controllers/AuthController.js";
 const Router = router.Router();
 Router.post("/login", loginToGroup);
 Router.post("/create_group", createGroup);
