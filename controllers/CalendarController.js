@@ -28,24 +28,22 @@ export const createTask = async (req, res) => {
         curSubject = await newSubj.save();
       }
     } else {
-      return res.json({ validationError: true });
+      return res.json({ validationError1: true });
     }
   } catch (err) {
     console.log(error);
   }
-  if (date.year && date.month && date.day) {
-    const newTask = new Task({
-      title,
-      index: subject.index,
-      date,
-      group: group._id,
-      subject: curSubject._id,
-      createdByUser: user._id,
-      type,
-      description: req.body.description ?? "",
-    });
-    await newTask.save();
-  } else return res.json({ validationError: true });
+  const newTask = new Task({
+    title,
+    index: subject.index,
+    date,
+    group: group._id,
+    subject: curSubject._id,
+    createdByUser: user._id,
+    type,
+    description: req.body.description ?? "",
+  });
+  await newTask.save();
   return res.json({ created: true });
 };
 export const getData = async (req, res) => {
