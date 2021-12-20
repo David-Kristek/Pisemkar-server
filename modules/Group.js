@@ -18,8 +18,8 @@ const groupSchema = new mongoose.Schema(
           subject: {
             Abbrev: String,
             Name: String,
-            Room: String,
           },
+          room: String,
         },
       ],
     ],
