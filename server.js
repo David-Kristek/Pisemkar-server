@@ -5,6 +5,7 @@ import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
 import socket from "./lib/sockets/index.js";
+import morgan from "morgan";
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -31,11 +32,15 @@ mongoose
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(morgan("tiny"))
 app.get("/", (req, res) => {
   res.send("Hello");
 });
 
 import auth from "./routes/auth.js";
-import calendar from "./routes/calendar.js";
+import task from "./routes/task.js";
 app.use("/auth", auth);
-app.use("/calendar", calendar);
+app.use("/task", task);
+app.get("/errorstatus", (req, res) => {
+  res.status(500).json({message: "Ahojda"})
+})

@@ -15,13 +15,17 @@ import getCalendarData from "../lib/bakalariformater.js";
 const loginToGroup = async (req, res) => {
   console.log(req.body);
   if (validateData(["username", "email", "groupname", "address"], req.body))
-    return res.send("Neplatná data");
+    return res.status(400).send("Neplatná data");
   const { username, email, groupname, address } = req.body;
   const group = await Group.findOne({ name: groupname });
   console.log(groupname);
-  if (!group) return res.json({ groupname: "Tato skupina neexistuje" });
+  if (!group) {
+    console.log("response");
+    return res.status(400).json({ groupname: "Tato skupina neexistuje" });
+  }
   const user = await User.findOne({ email });
   if (user) {
+    console.log(address);
     const isVerified = await User.findOne({
       _id: user._id,
       verifiedDevices: { $in: address },
@@ -31,7 +35,9 @@ const loginToGroup = async (req, res) => {
         { _id: user._id, groupname },
         process.env.TOKEN_SECRET
       );
-      return res.json({ token, user });
+      return res.json({
+        user: { username: user.username, email: user.email, token, groupname },
+      });
     }
   } else {
     const newUser = new User({
@@ -63,7 +69,7 @@ const createGroup = async (req, res) => {
       req.body
     )
   )
-    return res.send("Neplatná data");
+    return res.status(400).send("Neplatná data");
   const {
     username,
     email,
@@ -73,7 +79,8 @@ const createGroup = async (req, res) => {
     address,
   } = req.body;
   const group = await Group.findOne({ name: groupname });
-  if (group) return res.json({ groupname: "Tato skupina již existuje" });
+  if (group)
+    return res.status(400).json({ groupname: "Tato skupina již existuje" });
   // ověření údajů do bakalářů
   const body = new URLSearchParams();
   body.append("client_id", "ANDR");
@@ -92,14 +99,21 @@ const createGroup = async (req, res) => {
     });
     const data = await bakalariLogin.json();
     if (data.error) {
-      return res.json({ bakalariError: "Neplatné údaje do bakalařů" });
+      return res
+        .status(400)
+        .json({ bakalariError: "Neplatné údaje do bakalařů" });
     } else if (data.refresh_token) {
       refreshBakalariToken = data.refresh_token;
       bakalariToken = data.access_token;
-    } else return res.json({ bakalariError: "Neplatné údaje do bakalařů" });
+    } else
+      return res
+        .status(400)
+        .json({ bakalariError: "Neplatné údaje do bakalařů" });
   } catch (err) {
     console.log(err);
-    return res.json({ bakalariError: "Neplatné údaje do bakalařů" });
+    return res
+      .status(400)
+      .json({ bakalariError: "Neplatné údaje do bakalařů" });
   }
   const user = await User.findOne({ email });
   console.log(user);
@@ -122,8 +136,9 @@ const createGroup = async (req, res) => {
         calendarData,
       });
       await newGroup.save();
-
-      return res.json({ token, user });
+      return res.json({
+        user: { username: user.username, email: user.email, token, groupname },
+      });
     }
   } else {
     const newUser = new User({
@@ -146,13 +161,14 @@ const createGroup = async (req, res) => {
 };
 
 const loginEmailVerification = async (req, res) => {
-  if (validateData(["token"], req.query)) return res.send("Neplatná data");
+  if (validateData(["token"], req.query))
+    return res.status(400).send("Neplatná data");
   const { email, address, groupname } = jwt.verify(
     req.query.token,
     process.env.TOKEN_SECRET
   );
   const user = await User.findOne({ email });
-  if (!user) return res.send("Uživatel nenalezen");
+  if (!user) return res.status(400).send("Uživatel nenalezen");
   await User.updateOne(
     { _id: user._id },
     { $addToSet: { verifiedDevices: address } }
@@ -162,11 +178,11 @@ const loginEmailVerification = async (req, res) => {
     { name: groupname },
     { $addToSet: { members: user._id } }
   );
-  // socket send to device user, token
   return res.send(landingPageLogin(user, groupname));
 };
 const createGroupEmailVerification = async (req, res) => {
-  if (validateData(["token"], req.query)) return res.send("Neplatná data");
+  if (validateData(["token"], req.query))
+    return res.status(400).send("Neplatná data");
   const { email, address, groupname } = jwt.verify(
     req.query.token,
     process.env.TOKEN_SECRET
@@ -178,7 +194,7 @@ const createGroupEmailVerification = async (req, res) => {
       groupname,
     })
   )
-    return res.send("Neplatný token");
+    return res.status(400).send("Neplatný token");
   var user = await User.findOne({ email });
   const groupAL = await Group.findOne({ name: groupname });
   if (groupAL) return res.send(landingPageRegister(user, groupname));
@@ -187,7 +203,7 @@ const createGroupEmailVerification = async (req, res) => {
       { _id: user._id },
       { $addToSet: { verifiedDevices: address } }
     );
-  } else res.send("Neplatný token");
+  } else res.status(400).send("Neplatný token");
   return res.send(landingPageRegister(user, groupname));
 };
 
