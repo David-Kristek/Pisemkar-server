@@ -10,7 +10,7 @@ import Group from "../modules/Group.js";
 export const createTask = async (req, res) => {
   if (validateData(["title", "date", "subject", "type"], req.body))
     return res.status(400).json({ validationError: true });
-  const { title, date, subject, type } = req.body;
+  const { title, date, subject, type, personal } = req.body;
   const { user, group } = req;
   var curSubject;
   try {
@@ -47,6 +47,7 @@ export const createTask = async (req, res) => {
     createdByUser: user._id,
     type,
     description: req.body.description ?? "",
+    personal,
   };
 
   const newTask = new Task(newTaskData);
@@ -55,19 +56,39 @@ export const createTask = async (req, res) => {
   return res.send(newTaskFilled);
 };
 export const getData = async (req, res) => {
-  // returns group.timetable, tasks
-  // const group = await Group.findOne(
-  //   { _id: req.group._id },
-  //   { calendarData: 1 }
-  // );
   try {
-    const tasks = await Task.find({ group: req.group._id }).populate("subject");
+    const tasks = await Task.find({
+      group: req.group._id,
+      $or: [
+        { $or: [{ personal: { $exists: false } }, { personal: false }] },
+        {
+          $and: [{ personal: true }, { createdByUser: req.user._id }],
+        },
+      ],
+    }).populate("subject");
     return res.send(tasks);
   } catch (err) {
     return res.status(500).send(err);
   }
-  // return res.json({ timetable: group.calendarData, tasks });
-  // res.json({success: true})
+};
+export const updateTask = async (req, res) => {
+  const receivedTask = req.body.task;
+  if (!receivedTask) return res.status(400).json({ validationError: true });
+  const { _id, subject, title, description, date, personal } = receivedTask;
+  try {
+    const resp = await Task.updateOne(
+      { _id, group: req.group._id },
+      { title, description, date, personal }
+    );
+    await Subjects.updateOne(
+      { title: subject.title, group: req.group },
+      { color: subject.color }
+    );
+    return res.send(receivedTask);
+  } catch (err) {
+    console.log(err, "update error");
+    res.status(400).send(err);
+  }
 };
 export const deleteTask = async (req, res) => {
   if (!req.body.id) return res.status(400).json({ validationError: true });
