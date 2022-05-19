@@ -48,6 +48,6 @@ app.get("/errorstatus", (req, res) => {
 app.post("/davidkristek/sendemail", (req, res) => {
   if (!req.body.name || !req.body.email || !req.body.message)
   return res.status(400).json({ error: "Vyplňte všechny údaje" });
-  sendEmail("david.kristek05@gmail.com", `Nová zpráva ze stránky DavidKristek od: ${req.body.name}`, req.body.message)
+  sendEmail("david.kristek05@gmail.com", `Nová zpráva ze stránky DavidKristek od: ${req.body.name} ${req.body.email}`, req.body.message)
   return res.json({msg: "success"})
 });
