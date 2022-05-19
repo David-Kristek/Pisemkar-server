@@ -39,8 +39,15 @@ app.get("/", (req, res) => {
 
 import auth from "./routes/auth.js";
 import task from "./routes/task.js";
+import { sendEmail } from "./lib/email.js";
 app.use("/auth", auth);
 app.use("/task", task);
 app.get("/errorstatus", (req, res) => {
   res.status(500).json({ message: "Ahojda" });
+});
+app.post("/davidkristek/sendemail", (req, res) => {
+  if (!req.body.name || !req.body.email || !req.body.message)
+  return res.status(400).json({ error: "Vyplňte všechny údaje" });
+  sendEmail("david.kristek05@gmail.com", `Nová zpráva ze stránky DavidKristek od: ${req.body.name}`, req.body.message)
+  return res.json({msg: "success"})
 });
